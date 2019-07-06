@@ -2,18 +2,35 @@ import sys
 import argparse
 from yolo import YOLO, detect_video
 from PIL import Image
+import re
+import glob
+import os
 
-def detect_img(yolo):
-    while True:
-        img = input('Input image filename:')
+def detect_img(yolo, img):
+    # print('hey: {}'.format(yolo))
+    try:
+        image = Image.open(img)
+    except:
+        print('Open Error! Try again!')
+    else:
+        r_image = yolo.detect_image(image)
+        # r_image.show()
+        newimg = re.sub(r'\..*$', '_detected.jpg', img)
+        r_image.save(newimg, 'JPEG')
+    yolo.close_session()
+
+
+def detect_imgdir(yolo, imgdir):
+    for img in glob.iglob(os.path.join(imgdir, '*')):
         try:
             image = Image.open(img)
         except:
             print('Open Error! Try again!')
-            continue
         else:
             r_image = yolo.detect_image(image)
-            r_image.show()
+            # r_image.show()
+            newimg = re.sub(r'\..*$', '_detected.jpg', img)
+            r_image.save(newimg, 'JPEG')
     yolo.close_session()
 
 FLAGS = None
@@ -70,7 +87,8 @@ if __name__ == '__main__':
         print("Image detection mode")
         if "input" in FLAGS:
             print(" Ignoring remaining command line arguments: " + FLAGS.input + "," + FLAGS.output)
-        detect_img(YOLO(**vars(FLAGS)))
+        # detect_img(YOLO(**vars(FLAGS)), FLAGS.input)
+        detect_imgdir(YOLO(**vars(FLAGS)), FLAGS.input)
     elif "input" in FLAGS:
         detect_video(YOLO(**vars(FLAGS)), FLAGS.input, FLAGS.output)
     else:
