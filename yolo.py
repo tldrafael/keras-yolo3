@@ -179,6 +179,7 @@ def detect_video(yolo, video_path, output_path=""):
     video_fps       = vid.get(cv2.CAP_PROP_FPS)
     video_size      = (int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)),
                         int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    total_frame_count = int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
     isOutput = True if output_path != "" else False
     if isOutput:
         print("!!! TYPE:", type(output_path), type(video_FourCC), type(video_fps), type(video_size))
@@ -187,7 +188,7 @@ def detect_video(yolo, video_path, output_path=""):
     curr_fps = 0
     fps = "FPS: ??"
     prev_time = timer()
-    while True:
+    for c in range(total_frame_count):
         return_value, frame = vid.read()
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
